@@ -16,7 +16,7 @@ class Task():
         """
         # Simulation
         self.sim = PhysicsSim(init_pose, init_velocities, init_angle_velocities, runtime) 
-        self.action_repeat = 3
+        self.action_repeat = 5
 
         self.state_size = self.action_repeat * 6
         self.action_low = 0
@@ -24,11 +24,72 @@ class Task():
         self.action_size = 4
 
         # Goal
-        self.target_pos = target_pos if target_pos is not None else np.array([0., 0., 10.]) 
+        # tj: why does this not involve the Euler angles, only the positional coordinates?
+        self.target_pos = target_pos if target_pos is not None else np.array([0., 0., 20.]) 
 
-    def get_reward(self):
+    def get_reward(self ):
         """Uses current pose of sim to return reward."""
-        reward = 1.-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum()
+        xy_velocity_penalty = np.abs( self.sim.v[0] ) + np.abs( self.sim.v[1] ) # only x and y velocities are penalized
+        ang_velocity_penalty = abs(self.sim.angular_v).sum() # O(0.1))
+        xy_deviation2 = np.sum([ d**2 for d in (self.sim.pose[:2] - self.target_pos[:2])]) 
+        total_L2_deviation = np.sum([ d**2 for d in (self.sim.pose[:3] - self.target_pos)]) #O(1000)
+        total_L1_deviation = (abs(self.sim.pose[:3] - self.target_pos)).sum() #O(1000)
+        z_velocity = self.sim.v[2]
+        
+        reward_l1= -1e-2 * total_L1_deviation
+        reward_sqrt_l1 = -1e-3 * np.sqrt( total_L1_deviation )
+        reward_squared_l1 = -1e-4 * ( total_L1_deviation**2 )
+        reward_target_vicinity = 100 / (0.1 + total_L2_deviation )
+#        if ( 5 > self.sim.pose[2] > 4.4 ):
+#            print('xy_v_penalty=', xy_velocity_penalty, ' omega_penalty=', ang_velocity_penalty, 
+#              ' xy_deviation2=',xy_deviation2, ' total_L2_deviation=', total_L2_deviation, ' total_L1_deviation=',total_L2_deviation)
+#            return   
+#        if ( 1.5 < self.sim.pose[2] < 2):
+#            print('reward_l1=', reward_l1, ' reward_sqrt_l1=', reward_sqrt_l1, 
+#                  ' reward_squared_l1=',reward_squared_l1, ' reward_target_vicinity=', reward_target_vicinity)
+#            return
+        
+        
+#        reward = 1 - 0.5*(abs(self.sim.pose[:3] - self.target_pos)).sum()
+#        reward -= 0.05 *velocity_penalty 
+#        reward -= 0.01* ang_velocity_penalty
+#        reward = 0.05 + 0.5 * ( self.sim.pose[2] - self.target_pos[2] )
+#        reward -= 0.01*xy_deviation2
+#        reward = np.tanh(reward)
+#        reward = 1 
+#        reward += (self.sim.pose[2] - self.target_pos[2])
+#        reward -= 0.01 * total_L1_deviation
+#        reward -= 0.01 * velocity_penalty
+#        reward -= 0.01 * ang_velocity_penalty
+#        reward -= 0.01 * xy_deviation2
+#        
+        
+        reward = 1
+        reward += reward_l1
+        # adding both square and sqrt keep driving to the target strongly (sqrt is weak when far and square is weak when near)
+        reward += reward_sqrt_l1
+        reward += reward_squared_l1
+#        if total_L2_deviation < 2:
+        # reward for being close to the target
+        reward += reward_target_vicinity
+        # reward z-velocity if you are getting close to the ground
+#        if self.sim.v[2] < 5:
+#            reward += 0.5 * z_velocity / (0.01+self.sim.pose[2])
+        
+#        reward -= 0.01 * xy_velocity_penalty
+        
+        # try an exponential reward
+#        reward = np.exp( -0.1*total_L1_deviation ) #this is like the potential described in the Udacity RL course (Isbell & Littman)
+#        reward += 0.1 * z_velocity**2
+#        print(rotor_speeds) How to penalize vastly different rotor speeds if
+#        reward -= 0.1 * (np.max(rotor_speeds) - np.min(rotor_speeds) )
+#        reward -= 0.01 * ang_velocity_penalty
+        
+#        x_penalty = .1
+#        y_penalty = .1
+#        z_penalty = 1.5
+#        reward =  1. - x_penalty*abs(self.sim.pose[0]-self.target_pos[0]) -y_penalty*abs(self.sim.pose[1]-self.target_pos[1]) - z_penalty*abs(self.sim.pose[2]-self.target_pos[2])
+#        reward = np.tanh( reward )
         return reward
 
     def step(self, rotor_speeds):
