@@ -31,7 +31,7 @@ class Critic:
         # Define input layers
         states = layers.Input(shape=(self.state_size,), name='states')
         actions = layers.Input(shape=(self.action_size,), name='actions')
-        drop_prob = 0.25
+        drop_prob = 0.4
         # Add hidden layer(s) for state pathway
 #        net_states = layers.Dense(units=32, activation='relu')(states)
 #        net_states = layers.Dense(units=64, activation='relu')(net_states)
@@ -84,11 +84,15 @@ class Critic:
         net = layers.Dropout( drop_prob )( net )
         net = layers.Activation( 'relu' )( net )
         
-#        net = layers.Dense(units=32, kernel_regularizer = layers.regularizers.l2(0.01))( net )
-#        net = layers.BatchNormalization()( net )
-#        net = layers.Dropout( drop_prob )( net )
-#        net = layers.Activation( 'relu' )( net )
+        net = layers.Dense(units=64, kernel_regularizer = layers.regularizers.l2(0.01))( net )
+        net = layers.BatchNormalization()( net )
+        net = layers.Dropout( drop_prob )( net )
+        net = layers.Activation( 'relu' )( net )
 
+        net = layers.Dense(units=32, kernel_regularizer = layers.regularizers.l2(0.01))( net )
+        net = layers.BatchNormalization()( net )
+        net = layers.Dropout( drop_prob )( net )
+        net = layers.Activation( 'relu' )( net )
         # Add final output layer to prduce action values (Q values)
         Q_values = layers.Dense(units=1, name='q_values')(net)
 
@@ -96,7 +100,7 @@ class Critic:
         self.model = models.Model(inputs=[states, actions], outputs=Q_values)
 
         # Define optimizer and compile model for training with built-in loss function
-        optimizer = optimizers.Adam(lr=0.01)
+        optimizer = optimizers.Adam(lr=0.001)
         self.model.compile(optimizer=optimizer, loss='mse')
 
         # Compute action gradients (derivative of Q values w.r.t. to actions)
