@@ -34,18 +34,18 @@ class DDPG():
         self.actor_target.model.set_weights(self.actor_local.model.get_weights())
 
         # Noise process
-        self.exploration_mu = 0.1
-        self.exploration_theta = 0.1
-        self.exploration_sigma = 0.5
+        self.exploration_mu = 0.05 #0.1
+        self.exploration_theta = 1.0 #0.1
+        self.exploration_sigma = 0.8 #0.5
         self.noise = OUNoise(self.action_size, self.exploration_mu, self.exploration_theta, self.exploration_sigma)
 
         # Replay memory
-        self.buffer_size = 1000 #100000
+        self.buffer_size = 5000 #100000 #1000
         self.batch_size = 64
         self.memory = ReplayBuffer(self.buffer_size, self.batch_size)
 
         # Algorithm parameters
-        self.gamma = 0.9  # discount factor
+        self.gamma = 0.99  # discount factor
         self.tau = 0.01  #0.01  # for soft update of target parameters
 
     def reset_episode(self):
