@@ -15,13 +15,13 @@ class Task():
             target_pos: target/goal (x,y,z) position for the agent
         """
         # Simulation
-#        self.init_pose = init_pose
+        self.init_pose = init_pose
         self.sim = PhysicsSim(init_pose, init_velocities, init_angle_velocities, runtime) 
-        self.action_repeat = 5
+        self.action_repeat = 3
 
         self.state_size = self.action_repeat * 6
-        self.action_low = 0
-        self.action_high = 1000
+        self.action_low = 400
+        self.action_high = 500
         self.action_size = 4
 
         # Goal
@@ -36,17 +36,19 @@ class Task():
 #        total_L2_deviation = np.sum([ d**2 for d in (self.sim.pose[:3] - self.target_pos)]) #O(1000)
         total_L1_deviation = (abs(self.sim.pose[:3] - self.target_pos)).sum() #O(1000)
         z_velocity = self.sim.v[2]
-        z = self.sim.pose[2]    
+        z = self.sim.pose[2] 
+        z_deviation = z - self.target_pos[2]
 
         
         reward_target_z_nbd = 2 if abs(z - self.target_pos[2])<1 else 0
         reward_target_xy_nbd = 10 if ( reward_target_z_nbd==1 and xy_deviation2<2 ) else 0
-        reward_l1 = -5e-3 * total_L1_deviation #the farther you are from target, the more negative it is
+        reward_z = 5e-2*abs( z_deviation ) #positive if quadcopter higher than target
+        reward_l1 = -1e-2 * total_L1_deviation #the farther you are from target, the more negative it is
 #        reward_l2 = -5e-3 * total_L2_deviation #the farther you are from target, the more negative it is
-#        reward_z_velocity = 1e-2 * ( self.target_pos[2] -z ) * z_velocity #reward z velocity if below target and penalize if above target 
+        reward_z_velocity = -1e-3 * z_deviation * z_velocity #reward z velocity if below target and penalize if above target 
 #        reward_xydeviation = -1e-2*xy_deviation2 #penalize x and y deviations in the 
         # The reward below should cause a slowdown as the copter approaches the target 
-        reward_z_between_terminals = 1e-4 * (self.target_pos[2]-z) * (z-10) #if (self.init_pose[2]<z<self.target_pos[2]) else 0#positive between start and end and negative otherwise        
+#        reward_z_between_terminals = 1e-4 * (self.target_pos[2]-z) * (z-self.init_pose[2]) #if (self.init_pose[2]<z<self.target_pos[2]) else 0#positive between start and end and negative otherwise        
 #        reward_sqrt_l1 = -1e-3 * np.sqrt( total_L1_deviation )
 #        reward_squared_l1 = -1e-4 * ( total_L1_deviation**2 )
         
@@ -55,13 +57,14 @@ class Task():
 #       
 #        reward_list = [1, reward_z_velocity, reward_target_nbd]
 #        reward_list = [1, reward_l1, reward_z_velocity, reward_target_nbd] # this learned
-        reward_list = [0.5, reward_l1, reward_z_between_terminals, reward_target_z_nbd, reward_target_xy_nbd]
+#        reward_list = [0.5, reward_l1, reward_z_between_terminals, reward_target_z_nbd, reward_target_xy_nbd]
+        reward_list = [0.5, reward_l1, reward_z, reward_target_z_nbd, reward_target_xy_nbd]
 
 #        reward_list = [0.1, reward_l1, reward_z_velocity, reward_target_nbd]
         
 #        reward_list = [0.1, reward_l1, reward_xydeviation, reward_target_nbd, reward_z_between_terminals ] #, reward_xydeviation, reward_z_between_terminals ] 
         reward = np.sum(reward_list)
-        reward = np.tanh(reward)
+#        reward = np.tanh(reward)
         
         
 #        if ( 5 > self.sim.pose[2] > 4.4 ):
