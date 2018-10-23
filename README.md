@@ -1,35 +1,26 @@
-# Deep RL Quadcopter Controller
 
-*Teach a Quadcopter How to Fly!*
+The projects in this repository are exmaples of the use of deep neural
+networks (DNN) to solve some challenging problems.
+Five of the projects are ones that I did for Udacity's Deep Learning nanodegree program.
 
-In this project, you will design an agent to fly a quadcopter, and then train it using a reinforcement learning algorithm of your choice! 
+The projects are described briefly here.  For a more detailed
+introduction, please see the README files within the subdirectory of
+each project.
 
-## Project Instructions
-
-1. Clone the repository and navigate to the downloaded folder.
-
-```
-git clone https://github.com/udacity/RL-Quadcopter-2.git
-cd RL-Quadcopter-2
-```
-
-2. Create and activate a new environment.
-
-```
-conda create -n quadcop python=3.6 matplotlib numpy pandas
-source activate quadcop
-```
-
-3. Create an [IPython kernel](http://ipython.readthedocs.io/en/stable/install/kernel_install.html) for the `quadcop` environment. 
-```
-python -m ipykernel install --user --name quadcop --display-name "quadcop"
-```
-
-4. Open the notebook.
-```
-jupyter notebook Quadcopter_Project.ipynb
-```
-
-5. Before running code, change the kernel to match the `quadcop` environment by using the drop-down menu (**Kernel > Change kernel > quadcop**). Then, follow the instructions in the notebook.
-
-6. You will likely need to install more pip packages to complete this project.  Please curate the list of packages needed to run your project in the `requirements.txt` file in the repository.
+The projects are:
+- A __convolutional neural network__ (CNN) that's trained on a database of
+dog images and then, when shown a new dog image, can classify the dog
+into one of 133 breeds. (Random guessing would have only a success rate of 1/133!).
+- A __recurrent neural network__ (RNN), here, long short term memory cells
+(LSTM), multiple stacked layers of them, used to learn from scripts
+from the TV series 'The Simpsons' - only from scenes set in Moe's
+tavern, to general a new script automatically. When the script is
+trained on lines from all scenes (not just from Moe's Tavern), the
+quality of the generated script improves.
+- A __multi-level-perceptron__ (MLP) or _vanilla deep neural network_
+  for predicting user data over time for a bike-sharing company.
+- A __Deep Convolutional Generative Adversarial Network__ (DCGAN) to
+generate a bunch of human face images. The generator and discrimator
+networks in this project are both CNNs.
+- A __Reinforcement Learning__ (RL) problem using the actor-critic method to teach a
+quadcopter how to perform a certain task (takeoff in this case).
