@@ -48,6 +48,32 @@ classes to get a prediction. Further explanation of feature matching,
 how and why the `extra_class` value is set, are in comments in the
 notebook.
 
+## Loss definition and optimization
+
+The optimizer is an [Adam optimizer](https://arxiv.org/abs/1412.6980).
+The optimization is done by simultaneously minimizing the
+discriminator loss `d_loss` and the generator loss `g_loss` at each
+step of training.
+
+The `d_loss` consists of three components which are summed together -
+a softmax cross entropy loss on the images that are classified into
+one of the 10 classes, and sigmoid cross entropy losses on the images
+for the real/fake classification (the fake ones are compared with zero
+and the real ones are compared with 1).
+
+The generator loss is the "feature matching" loss from Tim Salimans
+*et al* (see reference below) where the idea is to minimize the
+absolute difference between the mean of various features (channels)
+that are obtained when the real images and fake images are passed
+through the discriminator.
+
+As in the case of generative models, as the discriminator loss is
+minimized, it gets better at telling fakes from the real images and
+since the generator loss is being minimized simultaneously, it gets
+better at faking the images.  Here, the extra training of the
+discriminator is helping it get much better on the classification
+problem, for which it has only a little data.
+
 ## References
 
 The notebook is an implementation of the idea described in the 2016
