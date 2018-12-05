@@ -36,7 +36,7 @@ are in `problem_unittests.py`.
 
 The file `smaller_lr_beta_digit_face_generation.ipynb` is included to demonstrate the
 performance that can already be observed with poorer training (smaller
-learning rate and momentum $\beta$).
+learning rate and momentum beta).
 
 ## Architecture
 
