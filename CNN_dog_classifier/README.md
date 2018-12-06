@@ -8,7 +8,7 @@ confidence, the network outputs the other breeds that it thinks form
 part of the ancestry of the dog. As a lighter aside, there is a
 section to accept photos of human beings (celebrities in this
 notebook) and the network, after deciding that it is not a dog, gives
-an estimate of which categogy of dog the person most closely
+an estimate of which category of dog the person most closely
 resembles.
 
 Performance on three neural networks is demonstrated - one is
@@ -39,13 +39,20 @@ The network architecture consist of three convolutional layers, each
 followed by max-pooling and incorporating dropout, as well as a fourth
 convolutional layer that uses global average pooling.  This final
 flattened layer is connected to a fully connected (dense) layer of 133
-nodes and a softmax activation. The accuracy of this network is over 81%. 
+nodes and a softmax activation. The accuracy of this network is over 13%. 
 
 ## Transfer learning
 
-Here, a model trained on other images is connected to a GAP
-layer (global average pooling) and then to a fully connected layer
-with softmax activation.  During training, only the added layers are trained, *i.e.*, the pretrained weights are frozen.  
+A heavily-trained model (even on other images) can do very well.  This
+is demonstrated by using a pre-trained VGG16 model to predict the dog
+breeds and it's found to have 41% accuracy with training on the
+current dataset only for the final GAP and softmax layers.
+
+Then, bottleneck features from a model (Resnet_50) trained on other
+images is connected to a GAP layer (global average pooling) and then
+to a fully connected layer with softmax activation.  During training,
+only the added layers are trained, *i.e.*, the pretrained weights are
+frozen.  The accuracy now rises to ver 81%!
 
 ## Losses and optimizer and used of the best model
 
